@@ -1,0 +1,43 @@
+server:
+  port: 28090
+grpc:
+  port: 6565
+  enableReflection: true
+spring:
+  application.name: test-app
+management:
+  tracing:
+    enabled: true
+    sampling.probability: 1.0
+  otlp.tracing.endpoint: http://jaeger-collector:4317
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: ["health", "grpc", "prometheus", "metrics"]
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: grpc
+        readiness:
+          include: grpc
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles:
+        http:
+          server:
+            requests: ["0.50","0.75","0.90","0.95","0.99","0.999"]
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /api-docs
+logging.pattern.level: "trace_id=%mdc{traceId} span_id=%mdc{spanId} %p"
